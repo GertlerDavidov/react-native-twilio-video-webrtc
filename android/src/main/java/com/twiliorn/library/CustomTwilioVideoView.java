@@ -293,13 +293,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     // ====== CONNECTING ===========================================================================
 
-    public void connectToRoomWrapper(String roomName, String accessToken) {
+    public void connectToRoomWrapper(String roomName, String accessToken, boolean videoEnabled) {
         this.roomName = roomName;
         this.accessToken = accessToken;
 
         Log.i("CustomTwilioVideoView", "Starting connect flow");
 
-        if (cameraCapturer == null) {
+        if (cameraCapturer == null && videoEnabled ) {
             createLocalMedia();
         } else {
             localAudioTrack = LocalAudioTrack.create(getContext(), true);
@@ -342,7 +342,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
              * speaker mode if this is not set.
              */
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            audioManager.setSpeakerphoneOn(!audioManager.isWiredHeadsetOn());
+            audioManager.setSpeakerphoneOn(false);
             getContext().registerReceiver(myNoisyAudioStreamReceiver, intentFilter);
         } else {
             audioManager.setMode(previousAudioMode);
