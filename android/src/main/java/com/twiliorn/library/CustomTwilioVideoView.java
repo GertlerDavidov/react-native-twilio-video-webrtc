@@ -307,10 +307,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    public void init() {
-        setAudioFocus(true);
-    }
-
     public void connectToRoom() {
         /*
          * Create a VideoClient allowing you to connect to a Room
@@ -331,6 +327,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
 
         room = Video.connect(getContext(), connectOptionsBuilder.build(), roomListener());
+    }
+
+    public void setFocus(boolean stat){
+        setAudioFocus(stat);
     }
 
     private void setAudioFocus(boolean focus) {
@@ -576,9 +576,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
                 CustomTwilioVideoView.room = null;
                 // Only reinitialize the UI if disconnect was not called from onDestroy()
-                if (!disconnectedFromOnDestroy) {
-                    setAudioFocus(false);
-                }
+               // if (!disconnectedFromOnDestroy) {
+                //    setAudioFocus(false);
+               // }
             }
 
             @Override
