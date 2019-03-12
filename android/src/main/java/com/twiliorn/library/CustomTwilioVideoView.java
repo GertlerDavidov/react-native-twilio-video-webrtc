@@ -307,11 +307,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
+    public void init() {
+        setAudioFocus(true);
+    }
+
     public void connectToRoom() {
         /*
          * Create a VideoClient allowing you to connect to a Room
          */
-        setAudioFocus(true);
+
         ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(this.accessToken);
 
         if (this.roomName != null) {
