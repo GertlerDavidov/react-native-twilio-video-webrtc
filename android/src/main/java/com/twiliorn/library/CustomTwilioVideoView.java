@@ -346,7 +346,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
              * speaker mode if this is not set.
              */
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            //audioManager.setSpeakerphoneOn(false);
+            audioManager.setSpeakerphoneOn(true);
             getContext().registerReceiver(myNoisyAudioStreamReceiver, intentFilter);
         } else {
             audioManager.setMode(previousAudioMode);
