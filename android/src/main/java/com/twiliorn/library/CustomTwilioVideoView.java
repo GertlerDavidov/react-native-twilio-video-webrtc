@@ -345,7 +345,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
              * possible VoIP performance. Some devices have difficulties with
              * speaker mode if this is not set.
              */
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            audioManager.setMode(AudioManager.MODE_RINGTONE);
             audioManager.setSpeakerphoneOn(true);
             getContext().registerReceiver(myNoisyAudioStreamReceiver, intentFilter);
         } else {
@@ -538,6 +538,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return new Room.Listener() {
             @Override
             public void onConnected(Room room) {
+                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
                 localParticipant = room.getLocalParticipant();
                 WritableMap event = new WritableNativeMap();
                 event.putString("room", room.getName());
@@ -565,6 +566,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onDisconnected(Room room, TwilioException e) {
+                audioManager.setMode(AudioManager.MODE_RINGTONE);
                 WritableMap event = new WritableNativeMap();
                 event.putString("participant", localParticipant.getIdentity());
                 pushEvent(CustomTwilioVideoView.this, ON_DISCONNECTED, event);
