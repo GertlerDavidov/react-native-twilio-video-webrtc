@@ -136,6 +136,7 @@ export default class extends Component {
     this.connect = this.connect.bind(this)
     this.disconnect = this.disconnect.bind(this)
     this.setRemoteAudioPlayback = this.setRemoteAudioPlayback.bind(this)
+    this.toggleSoundSetup = this.toggleSoundSetup.bind(this)
   }
 
   componentWillMount () {
@@ -149,6 +150,14 @@ export default class extends Component {
     this._stopLocalVideo()
     this._stopLocalAudio()
   }
+
+  /**
+  * Toggle audio setup from speaker (default) and headset
+  */
+   toggleSoundSetup (speaker) {
+     TWVideoModule.toggleSoundSetup(speaker)
+   }
+
 
   /**
    * Locally mute/ unmute all remote audio tracks from a given participant
