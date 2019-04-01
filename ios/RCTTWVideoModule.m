@@ -138,6 +138,36 @@ RCT_EXPORT_METHOD(stopLocalAudio) {
   self.localAudioTrack = nil;
 }
 
+RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {
+  if(speaker){
+      kDefaultAVAudioSessionConfigurationBlock();
+
+      // Overwrite the audio route
+      AVAudioSession *session = [AVAudioSession sharedInstance];
+      NSError *error = nil;
+      if (![session setMode:AVAudioSessionModeVideoChat error:&error]) {
+          NSLog(@"AVAudiosession setMode %@",error);
+      }
+
+      if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
+          NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+      }
+    } else {
+      kDefaultAVAudioSessionConfigurationBlock();
+
+      // Overwrite the audio route
+      AVAudioSession *session = [AVAudioSession sharedInstance];
+      NSError *error = nil;
+      if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
+          NSLog(@"AVAudiosession setMode %@",error);
+      }
+
+      if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
+          NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+      }
+    }
+}
+
 RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnabledWithResolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
   [self.localAudioTrack setEnabled:enabled];
