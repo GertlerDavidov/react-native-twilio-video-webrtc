@@ -145,13 +145,16 @@ RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {
       // Overwrite the audio route
       AVAudioSession *session = [AVAudioSession sharedInstance];
       NSError *error = nil;
-      if (![session setMode:AVAudioSessionModeVideoChat error:&error]) {
+      if (![session setMode:AVAudioSessionModeDefault error:&error]) {
           NSLog(@"AVAudiosession setMode %@",error);
       }
 
-      if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
+      if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error]) {
           NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
       }
+      //if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
+      //    NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+      //}
     } else {
       kDefaultAVAudioSessionConfigurationBlock();
 
@@ -298,6 +301,7 @@ RCT_EXPORT_METHOD(getStats) {
 
 RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName) {
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
+    [self.localVideoTrack setEnabled:false];
     if (self.localVideoTrack) {
       builder.videoTracks = @[self.localVideoTrack];
     }
@@ -309,7 +313,25 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
     builder.roomName = roomName;
   }];
 
+  NSLog(@"TwilioVideo connecting");
+
   self.room = [TwilioVideo connectWithOptions:connectOptions delegate:self];
+
+
+  kDefaultAVAudioSessionConfigurationBlock();
+
+  // Overwrite the audio route
+  AVAudioSession *session = [AVAudioSession sharedInstance];
+  NSError *error = nil;
+  if (![session setMode:AVAudioSessionModeDefault error:&error]) {
+      NSLog(@"AVAudiosession setMode %@",error);
+  }
+
+  if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error]) {
+      NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+  }
+
+
 }
 
 RCT_EXPORT_METHOD(disconnect) {
@@ -351,6 +373,8 @@ RCT_EXPORT_METHOD(disconnect) {
   }
   TVILocalParticipant *localParticipant = room.localParticipant;
   [participants addObject:[localParticipant toJSON]];
+
+  NSLog(@"TwilioVideo connected");
 
   [self sendEventWithName:roomDidConnect body:@{ @"roomName" : room.name , @"participants" : participants }];
 }
