@@ -171,6 +171,10 @@ RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {
     }
 }
 
+RCT_EXPORT_METHOD(startTwillio) {
+  [TwilioVideo init];
+}
+
 RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnabledWithResolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
   [self.localAudioTrack setEnabled:enabled];
@@ -300,8 +304,10 @@ RCT_EXPORT_METHOD(getStats) {
 }
 
 RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName) {
+
+
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
-    [self.localVideoTrack setEnabled:false];
+
     if (self.localVideoTrack) {
       builder.videoTracks = @[self.localVideoTrack];
     }
@@ -309,29 +315,13 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
     if (self.localAudioTrack) {
       builder.audioTracks = @[self.localAudioTrack];
     }
-
+    
     builder.roomName = roomName;
   }];
 
   NSLog(@"TwilioVideo connecting");
 
   self.room = [TwilioVideo connectWithOptions:connectOptions delegate:self];
-
-
-  kDefaultAVAudioSessionConfigurationBlock();
-
-  // Overwrite the audio route
-  AVAudioSession *session = [AVAudioSession sharedInstance];
-  NSError *error = nil;
-  if (![session setMode:AVAudioSessionModeDefault error:&error]) {
-      NSLog(@"AVAudiosession setMode %@",error);
-  }
-
-  if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error]) {
-      NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
-  }
-
-
 }
 
 RCT_EXPORT_METHOD(disconnect) {
