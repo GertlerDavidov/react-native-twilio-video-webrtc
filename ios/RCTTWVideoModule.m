@@ -146,18 +146,10 @@ RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {
   NSError *error = nil;
 
   if(speaker){
-      // Overwrite the audio route
-    //  if (![session setMode:AVAudioSessionModeDefault error:&error]) {
-          //NSLog(@"AVAudiosession setMode %@",error);
-      //}
       if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error]) {
           NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
       }
     } else {
-      //if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
-          //NSLog(@"AVAudiosession setMode %@",error);
-      //}
-
       if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
           NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
       }
@@ -314,40 +306,24 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
       if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
           NSLog(@"AVAudiosession setMode %@",error);
       }
-
-    //  [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error]
-
       AVAudioSessionRouteDescription* route = [[AVAudioSession sharedInstance] currentRoute];
 
       for (AVAudioSessionPortDescription* desc in [route outputs]) {
 
-        //printf("TwilioVideo", [desc portType]);
-
         if ([[desc portType] isEqualToString:AVAudioSessionPortHeadphones]){
-          printf("TwilioVideo AVAudioSessionPortHeadphones");
           [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
         }
 
         if ([[desc portType] isEqualToString:@"speaker"]){
-          printf("TwilioVideo speaker");
           [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
         }
 
       };
-      //if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error]) {
-          //NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
-      //}
   };
 
   self.localAudioTrack = [TVILocalAudioTrack trackWithOptions:nil enabled:YES name:@"microphone"];
 
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
-
-
-    //if (self.localVideoTrack) {
-    //  builder.videoTracks = @[self.localVideoTrack];
-    //}
-
     if (self.localAudioTrack) {
       builder.audioTracks = @[self.localAudioTrack];
     }
