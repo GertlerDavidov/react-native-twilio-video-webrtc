@@ -137,7 +137,7 @@ export default class extends Component {
     this.disconnect = this.disconnect.bind(this)
     this.setRemoteAudioPlayback = this.setRemoteAudioPlayback.bind(this)
     this.toggleSoundSetup = this.toggleSoundSetup.bind(this)
-    
+
   }
 
   componentWillMount () {
@@ -148,7 +148,7 @@ export default class extends Component {
 
   componentWillUnmount () {
     this._unregisterEvents()
-    //this._stopLocalVideo()
+    this._stopLocalVideo()
     this._stopLocalAudio()
   }
 
@@ -157,10 +157,6 @@ export default class extends Component {
   */
    toggleSoundSetup (speaker) {
      TWVideoModule.toggleSoundSetup(speaker)
-   }
-
-   startTwillio (speaker) {
-     TWVideoModule.startTwillio()
    }
 
   /**
