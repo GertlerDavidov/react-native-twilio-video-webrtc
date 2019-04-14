@@ -137,12 +137,13 @@ export default class extends Component {
     this.disconnect = this.disconnect.bind(this)
     this.setRemoteAudioPlayback = this.setRemoteAudioPlayback.bind(this)
     this.toggleSoundSetup = this.toggleSoundSetup.bind(this)
+    this.startTwillio = this.startTwillio.bind(this)
   }
 
   componentWillMount () {
     this._registerEvents()
-    this._startLocalVideo()
-    this._startLocalAudio()
+    //this._startLocalVideo()
+    //this._startLocalAudio()
   }
 
   componentWillUnmount () {
@@ -158,6 +159,9 @@ export default class extends Component {
      TWVideoModule.toggleSoundSetup(speaker)
    }
 
+   startTwillio (speaker) {
+     TWVideoModule.startTwillio()
+   }
 
   /**
    * Locally mute/ unmute all remote audio tracks from a given participant
