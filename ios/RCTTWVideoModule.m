@@ -36,6 +36,7 @@ static NSString* statsReceived                = @"statsReceived";
 @property (strong, nonatomic) TVIScreenCapturer *screen;
 @property (strong, nonatomic) TVILocalVideoTrack* localVideoTrack;
 @property (strong, nonatomic) TVILocalAudioTrack* localAudioTrack;
+@property (strong, nonatomic) TVIDefaultAudioDevice* audioDevice;
 @property (strong, nonatomic) TVIRoom *room;
 
 @end
@@ -139,31 +140,23 @@ RCT_EXPORT_METHOD(stopLocalAudio) {
 }
 
 RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {
+  //kDefaultAVAudioSessionConfigurationBlock();
+  AVAudioSession *session = [AVAudioSession sharedInstance];
+
+  NSError *error = nil;
+
   if(speaker){
-      kDefaultAVAudioSessionConfigurationBlock();
-
       // Overwrite the audio route
-      AVAudioSession *session = [AVAudioSession sharedInstance];
-      NSError *error = nil;
-      if (![session setMode:AVAudioSessionModeDefault error:&error]) {
-          NSLog(@"AVAudiosession setMode %@",error);
-      }
-
+    //  if (![session setMode:AVAudioSessionModeDefault error:&error]) {
+          //NSLog(@"AVAudiosession setMode %@",error);
+      //}
       if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error]) {
           NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
       }
-      //if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
-      //    NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
-      //}
     } else {
-      kDefaultAVAudioSessionConfigurationBlock();
-
-      // Overwrite the audio route
-      AVAudioSession *session = [AVAudioSession sharedInstance];
-      NSError *error = nil;
-      if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
-          NSLog(@"AVAudiosession setMode %@",error);
-      }
+      //if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
+          //NSLog(@"AVAudiosession setMode %@",error);
+      //}
 
       if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
           NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
@@ -171,9 +164,6 @@ RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {
     }
 }
 
-RCT_EXPORT_METHOD(startTwillio) {
-  [TwilioVideo init];
-}
 
 RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnabledWithResolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
@@ -305,17 +295,63 @@ RCT_EXPORT_METHOD(getStats) {
 
 RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName) {
 
+  self.audioDevice = [TVIDefaultAudioDevice audioDevice];
+
+  TwilioVideo.audioDevice = self.audioDevice;
+
+  //...connect to a Room with audioDevice. By default the audio route will be configured to speaker.
+
+  self.audioDevice.block =  ^ {
+      // We will execute `kDefaultAVAudioSessionConfigurationBlock` first.
+      //kDefaultAVAudioSessionConfigurationBlock();
+
+      // Overwrite the audio route
+      AVAudioSession *session = [AVAudioSession sharedInstance];
+      NSError *error = nil;
+
+      [session setCategory: AVAudioSessionCategoryPlayAndRecord error: nil];
+
+      if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
+          NSLog(@"AVAudiosession setMode %@",error);
+      }
+
+    //  [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error]
+
+      AVAudioSessionRouteDescription* route = [[AVAudioSession sharedInstance] currentRoute];
+
+      for (AVAudioSessionPortDescription* desc in [route outputs]) {
+
+        //printf("TwilioVideo", [desc portType]);
+
+        if ([[desc portType] isEqualToString:AVAudioSessionPortHeadphones]){
+          printf("TwilioVideo AVAudioSessionPortHeadphones");
+          [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
+        }
+
+        if ([[desc portType] isEqualToString:@"speaker"]){
+          printf("TwilioVideo speaker");
+          [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+        }
+
+      };
+      //if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error]) {
+          //NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+      //}
+  };
+
+  self.localAudioTrack = [TVILocalAudioTrack trackWithOptions:nil enabled:YES name:@"microphone"];
 
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
 
-    if (self.localVideoTrack) {
-      builder.videoTracks = @[self.localVideoTrack];
-    }
+
+    //if (self.localVideoTrack) {
+    //  builder.videoTracks = @[self.localVideoTrack];
+    //}
 
     if (self.localAudioTrack) {
       builder.audioTracks = @[self.localAudioTrack];
     }
-    
+
     builder.roomName = roomName;
   }];
 
