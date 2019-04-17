@@ -46,6 +46,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int GET_STATS = 6;
     private static final int DISABLE_OPENSL_ES = 7;
     private static final int SET_FOCUS = 8;
+    private static final int SET_SPEAKER = 9;
 
     @Override
     public String getName() {
@@ -63,6 +64,10 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case SET_FOCUS:
                 boolean focusStatus = args.getBoolean(0);
                 view.setFocus(focusStatus);
+                break;
+            case SET_SPEAKER:
+                boolean speakerStatus = args.getBoolean(0);
+                view.setSpeakerphone(speakerStatus);
                 break;
             case CONNECT_TO_ROOM:
                 String roomName = args.getString(0);
