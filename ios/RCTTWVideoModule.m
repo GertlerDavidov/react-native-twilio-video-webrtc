@@ -287,42 +287,45 @@ RCT_EXPORT_METHOD(getStats) {
 
 RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName) {
 
-  self.audioDevice = [TVIDefaultAudioDevice audioDevice];
 
-  TwilioVideo.audioDevice = self.audioDevice;
+  if (!self.localAudioTrack) {
 
-  //...connect to a Room with audioDevice. By default the audio route will be configured to speaker.
+    self.audioDevice = [TVIDefaultAudioDevice audioDevice];
 
-  self.audioDevice.block =  ^ {
-      // We will execute `kDefaultAVAudioSessionConfigurationBlock` first.
-      //kDefaultAVAudioSessionConfigurationBlock();
+    TwilioVideo.audioDevice = self.audioDevice;
 
-      // Overwrite the audio route
-      AVAudioSession *session = [AVAudioSession sharedInstance];
-      NSError *error = nil;
+    //...connect to a Room with audioDevice. By default the audio route will be configured to speaker.
 
-      [session setCategory: AVAudioSessionCategoryPlayAndRecord error: nil];
+    self.audioDevice.block =  ^ {
+        // We will execute `kDefaultAVAudioSessionConfigurationBlock` first.
+        //kDefaultAVAudioSessionConfigurationBlock();
 
-      if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
-          NSLog(@"AVAudiosession setMode %@",error);
-      }
-      AVAudioSessionRouteDescription* route = [[AVAudioSession sharedInstance] currentRoute];
+        // Overwrite the audio route
+        AVAudioSession *session = [AVAudioSession sharedInstance];
+        NSError *error = nil;
 
-      for (AVAudioSessionPortDescription* desc in [route outputs]) {
+       // [session setCategory: AVAudioSessionCategoryPlayAndRecord error: nil];
 
-        if ([[desc portType] isEqualToString:AVAudioSessionPortHeadphones]){
-          [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
+        if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
+            NSLog(@"AVAudiosession setMode %@",error);
         }
+        AVAudioSessionRouteDescription* route = [[AVAudioSession sharedInstance] currentRoute];
 
-        if ([[desc portType] isEqualToString:@"speaker"]){
-          [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
-        }
+        for (AVAudioSessionPortDescription* desc in [route outputs]) {
 
-      };
-  };
+          if ([[desc portType] isEqualToString:AVAudioSessionPortHeadphones] || [[desc portType] isEqualToString:AVAudioSessionPortBuiltInReceiver]){
+            [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
+          }
 
-  self.localAudioTrack = [TVILocalAudioTrack trackWithOptions:nil enabled:YES name:@"microphone"];
+          if ([[desc portType] isEqualToString:AVAudioSessionPortBuiltInSpeaker]){
+            [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+          }
 
+        };
+    };
+
+    self.localAudioTrack = [TVILocalAudioTrack trackWithOptions:nil enabled:YES name:@"microphone"];
+  }
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
     if (self.localAudioTrack) {
       builder.audioTracks = @[self.localAudioTrack];
