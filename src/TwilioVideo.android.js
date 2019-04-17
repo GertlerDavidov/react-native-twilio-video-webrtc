@@ -110,7 +110,8 @@ const nativeEvents = {
   toggleSound: 5,
   getStats: 6,
   disableOpenSLES: 7,
-  setFocus: 8
+  setFocus: 8,
+  setSpeakerphone: 9
 }
 
 class CustomTwilioVideoView extends Component {
@@ -119,6 +120,9 @@ class CustomTwilioVideoView extends Component {
   }
   setFocus (focusStatus) {
     this.runCommand(nativeEvents.setFocus, [focusStatus])
+  }
+  setSpeakerphone (speakerStatus) {
+    this.runCommand(nativeEvents.setSpeakerphone, [speakerStatus])
   }
   disconnect () {
     this.runCommand(nativeEvents.disconnect, [])
