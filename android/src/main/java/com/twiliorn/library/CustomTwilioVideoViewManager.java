@@ -47,6 +47,11 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int DISABLE_OPENSL_ES = 7;
     private static final int SET_FOCUS = 8;
     private static final int SET_SPEAKER = 9;
+    private static final int ELEVATOR = 10;
+    private static final int ELEVATOR_RESUME = 11;
+    private static final int ELEVATOR_PAUSE = 12;
+    private static final int ELEVATOR_STOP = 13;
+    private static final int AUDIO_RELEASE = 14;
 
     @Override
     public String getName() {
@@ -61,6 +66,23 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     @Override
     public void receiveCommand(CustomTwilioVideoView view, int commandId, @Nullable ReadableArray args) {
         switch (commandId) {
+
+            case AUDIO_RELEASE:
+                view.audioRelease();
+                break;
+            case ELEVATOR_PAUSE:
+                view.elevatorPause();
+                break;
+            case ELEVATOR_RESUME:
+                view.elevatorResume();
+                break;
+            case ELEVATOR_STOP:
+                view.elevatorStop();
+                break;
+            case ELEVATOR:
+                String fileName = args.getString(0);
+                view.elevator(fileName);
+                break;
             case SET_FOCUS:
                 boolean focusStatus = args.getBoolean(0);
                 view.setFocus(focusStatus);
