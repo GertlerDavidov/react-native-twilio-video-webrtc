@@ -111,7 +111,12 @@ const nativeEvents = {
   getStats: 6,
   disableOpenSLES: 7,
   setFocus: 8,
-  setSpeakerphone: 9
+  setSpeakerphone: 9,
+  elevator: 10,
+  elevatorResume: 11,
+  elevatorPause: 12,
+  elevatorStop: 13,
+  audioRelease: 14
 }
 
 class CustomTwilioVideoView extends Component {
@@ -120,6 +125,21 @@ class CustomTwilioVideoView extends Component {
   }
   setFocus (focusStatus) {
     this.runCommand(nativeEvents.setFocus, [focusStatus])
+  }
+  elevator (fileName) {
+    this.runCommand(nativeEvents.elevator, [fileName])
+  }
+  elevatorPause (fileName) {
+    this.runCommand(nativeEvents.elevatorPause)
+  }
+  elevatorResume (fileName) {
+    this.runCommand(nativeEvents.elevatorResume)
+  }
+  elevatorStop (fileName) {
+    this.runCommand(nativeEvents.elevatorStop)
+  }
+  audioRelease () {
+    this.runCommand(nativeEvents.audioRelease)
   }
   setSpeakerphone (speakerStatus) {
     this.runCommand(nativeEvents.setSpeakerphone, [speakerStatus])
