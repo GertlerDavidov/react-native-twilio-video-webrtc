@@ -156,6 +156,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         // add lifecycle for onResume and on onPause
         themedReactContext.addLifecycleEventListener(this);
 
+
+
         /*
          * Enable changing the volume using the up/down keys during a conversation
          */
@@ -166,6 +168,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
          * Needed for setting/abandoning audio focus during call
          */
         audioManager = (AudioManager) themedReactContext.getSystemService(Context.AUDIO_SERVICE);
+
+        previousAudioMode = audioManager.getMode();
 
         audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
 
@@ -351,7 +355,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
     private void setAudioFocus(boolean focus) {
         if (focus) {
-            previousAudioMode = audioManager.getMode();
+
             // Request audio focus before making any device switch.
             audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
                     AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
@@ -874,6 +878,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         mediaPlayer.seekTo(0);
     }
     public void audioRelease() {
+        audioManager.setMode(previousAudioMode);
         audioManager.abandonAudioFocus(null);
         try {
             themedReactContext.unregisterReceiver(myNoisyAudioStreamReceiver);
