@@ -874,8 +874,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         mediaPlayer.seekTo(0);
     }
     public void elevatorStop(){
-        mediaPlayer.pause();
-        mediaPlayer.seekTo(0);
+        try {
+            mediaPlayer.pause();
+            mediaPlayer.seekTo(0);
+        } catch (Exception e) {
+            // already registered
+        }
     }
     public void audioRelease() {
         audioManager.setMode(previousAudioMode);
